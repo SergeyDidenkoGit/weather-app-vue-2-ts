@@ -42,7 +42,10 @@
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
+import { namespace } from "vuex-class";
 import AutocompleteInput from "@/components/AutocompleteInput.vue";
+
+const ipModule = namespace("ipModule");
 
 @Component({
   name: "Main",
@@ -50,7 +53,14 @@ import AutocompleteInput from "@/components/AutocompleteInput.vue";
     AutocompleteInput,
   },
 })
-export default class Main extends Vue {}
+export default class Main extends Vue {
+  @ipModule.Action("fetchIP")
+  private fetchIP!: () => void;
+
+  private created(): void {
+    this.fetchIP();
+  }
+}
 </script>
 
 <style>

@@ -23,42 +23,26 @@
 import { Component } from "vue-property-decorator";
 import { mixins } from "vue-class-component";
 import AutocompleteMixin from "@/mixins/autocompleteMixin";
+import { namespace } from "vuex-class";
+
+const weatherModule = namespace("weatherModule");
 
 @Component({
   name: "autocompleteInput",
 })
 export default class autocompleteInput extends mixins(AutocompleteMixin) {
+  @weatherModule.Action("fetchCurrentWeatherByCity")
+  private fetchCurrentWeatherByCity!: (value: string) => void;
+
+  @weatherModule.Action("fetchWeatherByCity")
+  private fetchWeatherByCity!: (value: string) => void;
+
   selectCity(city: string): void {
+    this.fetchCurrentWeatherByCity(city);
+    this.fetchWeatherByCity(city);
     this.searchTerm = "";
   }
 }
-
-// export default {
-//   name: "autocomplete-input",
-//   mixins: [autocompleteMixin],
-//   data() {
-//     return {};
-//   },
-//   methods: {
-//     ...mapActions({
-//       fetchCurrentWeatherByCity: "weather/fetchCurrentWeatherByCity",
-//       fetchWeatherByCity: "weather/fetchWeatherByCity",
-//     }),
-//     selectCity(city) {
-//       this.fetchCurrentWeatherByCity(city);
-//       this.fetchWeatherByCity(city);
-//       this.searchTerm = "";
-//     },
-//   },
-//   setup() {
-//     const { searchTerm, searchCities } = useAutocomplete();
-
-//     return {
-//       searchTerm,
-//       searchCities,
-//     };
-//   },
-// };
 </script>
 
 <style scoped>
