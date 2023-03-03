@@ -1,21 +1,27 @@
 <template>
   <div>
-    <input :value="modelValue" @input="updateInput" type="text" />
+    <input :value="inputValue" @input="updateInput" type="text" />
   </div>
 </template>
 
-<script>
-export default {
-  name: "custom-input",
-  props: {
-    modelValue: [String, Number],
-  },
-  methods: {
-    updateInput(event) {
-      this.$emit("input", event.target.value);
-    },
-  },
-};
+<script lang="ts">
+import { Vue, Component, Prop } from "vue-property-decorator";
+
+@Component({
+  name: "CustomInput",
+})
+export default class CustomInput extends Vue {
+  @Prop()
+  private modelValue!: string | number;
+
+  public get inputValue(): string | number {
+    return this.modelValue;
+  }
+
+  public updateInput(event: Event) {
+    this.$emit("input", (event.target as HTMLInputElement).value);
+  }
+}
 </script>
 
 <style scoped>

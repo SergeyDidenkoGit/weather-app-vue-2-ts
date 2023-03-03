@@ -1,3 +1,3 @@
-export default interface IAutocomplete {
+export interface IAutocomplete {
   [key: string]: unknown;
 }

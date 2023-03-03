@@ -4,10 +4,13 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "custom-loader",
-};
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+
+@Component({
+  name: "CustomLoader",
+})
+export default class CustomLoader extends Vue {}
 </script>
 
 <style scoped>

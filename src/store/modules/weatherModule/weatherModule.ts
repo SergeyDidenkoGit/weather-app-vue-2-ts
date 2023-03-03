@@ -4,7 +4,20 @@ import {
   IWeatherModuleState,
   IWeatherModuleResponse,
 } from "@/interfaces/store/weatherModule/IWeatherModuleState";
-import axios from "axios";
+
+import {
+  requestCurrentWeatherByIP,
+  requestWeatherByIP,
+  requestCurrentWeatherByCity,
+  requestWeatherByCity,
+  requestCurrentWeatherByCoords,
+} from "@/services/http/weather-http.service";
+
+import {
+  weakWeatherDateUtil,
+  formattedWeakWeatherDateUtil,
+  formattedCitiesWeatherUtil,
+} from "@/utils/weatherModuleUtils";
 
 const state: IWeatherModuleState = {
   isLoading: true,
@@ -48,64 +61,16 @@ const getters: GetterTree<IWeatherModuleState, IRootState> = {
   },
   currentHumidity: (state): string => state.currentWeatherData?.main?.humidity,
   weakWeatherDate: (state): object => {
-    const weakDate = [];
-    const today: Date = new Date(
-      new Date().getFullYear(),
-      new Date().getMonth(),
-      new Date().getDate()
-    );
-
-    const nextDay: any = new Date(today.setDate(today.getDate() + 1));
-
-    for (let i = 0; i < state.weatherData?.list.length; i++) {
-      if (state.weatherData?.list[i].dt > Date.parse(nextDay) / 1000) {
-        weakDate.push(state.weatherData?.list[i]);
-        nextDay.setDate(nextDay.getDate() + 1);
-      } else {
-        continue;
-      }
-    }
-
-    return weakDate;
+    return weakWeatherDateUtil(state);
   },
   formattedWeakWeatherDate: (state, getters) => {
-    return getters.weakWeatherDate?.map((item: { [key: string]: any }) => {
-      return {
-        id: item?.dt,
-        date: new Date(item?.dt * 1000).toLocaleString(
-          "en-US",
-          state.dateOptions
-        ),
-        temperature: Math.round(item?.main?.temp),
-        feels: Math.round(item?.main?.feels_like),
-        clouds:
-          item?.weather[0]?.description[0].toUpperCase() +
-          item?.weather[0]?.description?.slice(1),
-        wind: item?.wind?.speed,
-        pressure: (item?.main?.pressure * 0.750063755419211).toFixed(0),
-        humidity: item?.main?.humidity,
-      };
+    return getters.weakWeatherDate?.map((item: Record<string, any>) => {
+      return formattedWeakWeatherDateUtil(state, item);
     });
   },
   formattedCitiesWeather: (state) => {
     return state.citiesWeather.map((item: { [key: string]: any }) => {
-      return {
-        id: item.id,
-        name: item.name,
-        coord: item.coord,
-        date: new Date(item?.dt * 1000).toLocaleString(
-          "en-US",
-          state.dateOptions
-        ),
-        temperature: Math.round(item?.main?.temp),
-        feels: Math.round(item?.main?.feels_like),
-        clouds:
-          item?.weather[0]?.description[0].toUpperCase() +
-          item?.weather[0]?.description?.slice(1),
-        wind: item?.wind?.speed,
-        pressure: (item?.main?.pressure * 0.750063755419211).toFixed(0),
-        humidity: item?.main?.humidity,
-      };
+      return formattedCitiesWeatherUtil(state, item);
     });
   },
 };
@@ -153,16 +118,9 @@ const mutations: MutationTree<IWeatherModuleState> = {
 const actions: ActionTree<IWeatherModuleState, IRootState> = {
   fetchCurrentWeatherByIP: async ({ state, commit }, userData) => {
     try {
-      const response: IWeatherModuleResponse = await axios.get(
-        "https://api.openweathermap.org/data/2.5/weather",
-        {
-          params: {
-            lat: userData.latitude,
-            lon: userData.longitude,
-            units: state.units,
-            appid: state.appid,
-          },
-        }
+      const response: IWeatherModuleResponse = await requestCurrentWeatherByIP(
+        userData,
+        state
       );
       commit("setCurrentWeatherData", response.data);
       commit("setCitiesWeather", response.data);
@@ -176,16 +134,9 @@ const actions: ActionTree<IWeatherModuleState, IRootState> = {
   },
   fetchWeatherByIP: async ({ state, commit }, userData) => {
     try {
-      const response: IWeatherModuleResponse = await axios.get(
-        "https://api.openweathermap.org/data/2.5/forecast",
-        {
-          params: {
-            lat: userData.latitude,
-            lon: userData.longitude,
-            units: state.units,
-            appid: state.appid,
-          },
-        }
+      const response: IWeatherModuleResponse = await requestWeatherByIP(
+        userData,
+        state
       );
       commit("setWeatherData", response.data);
     } catch (e) {
@@ -198,24 +149,8 @@ const actions: ActionTree<IWeatherModuleState, IRootState> = {
   },
   fetchCurrentWeatherByCity: async ({ state, commit }, city) => {
     try {
-      const response: IWeatherModuleResponse = await axios
-        .get("https://api.openweathermap.org/geo/1.0/direct", {
-          params: {
-            q: city,
-            limit: state.limit,
-            appid: state.appid,
-          },
-        })
-        .then((response) => {
-          return axios.get("https://api.openweathermap.org/data/2.5/weather", {
-            params: {
-              lat: response.data[0].lat,
-              lon: response.data[0].lon,
-              units: state.units,
-              appid: state.appid,
-            },
-          });
-        });
+      const response: IWeatherModuleResponse =
+        await requestCurrentWeatherByCity(city, state);
       console.log(response.data);
       commit("setCurrentWeatherData", response.data);
     } catch (e) {
@@ -226,24 +161,10 @@ const actions: ActionTree<IWeatherModuleState, IRootState> = {
   },
   fetchWeatherByCity: async ({ state, commit }, city) => {
     try {
-      const response: IWeatherModuleResponse = await axios
-        .get("https://api.openweathermap.org/geo/1.0/direct", {
-          params: {
-            q: city,
-            limit: state.limit,
-            appid: state.appid,
-          },
-        })
-        .then((response) => {
-          return axios.get("https://api.openweathermap.org/data/2.5/forecast", {
-            params: {
-              lat: response.data[0].lat,
-              lon: response.data[0].lon,
-              units: state.units,
-              appid: state.appid,
-            },
-          });
-        });
+      const response: IWeatherModuleResponse = await requestWeatherByCity(
+        city,
+        state
+      );
       commit("setWeatherData", response.data);
       console.log(response.data);
     } catch (e) {
@@ -254,17 +175,8 @@ const actions: ActionTree<IWeatherModuleState, IRootState> = {
   },
   fetchCurrentWeatherByCoords: async ({ state, commit }, userData) => {
     try {
-      const response: IWeatherModuleResponse = await axios.get(
-        "https://api.openweathermap.org/data/2.5/weather",
-        {
-          params: {
-            lat: userData.lat,
-            lon: userData.lon,
-            units: state.units,
-            appid: state.appid,
-          },
-        }
-      );
+      const response: IWeatherModuleResponse =
+        await requestCurrentWeatherByCoords(userData, state);
       return response.data;
     } catch (e) {
       console.log(e);

@@ -3,10 +3,10 @@
     <custom-input
       ref="autocompleteInput"
       class="autocomplete__input"
-      v-model="searchTerm"
+      v-model="searchTermValue"
       placeholder="Type city name ..."
     />
-    <ul class="autocomplete__dropdown" v-if="searchCities.length > 0">
+    <ul class="autocomplete__dropdown" v-if="searchCitiesLength">
       <li
         class="autocomplete__option"
         v-for="city in searchCities"
@@ -22,25 +22,29 @@
 <script lang="ts">
 import { Component } from "vue-property-decorator";
 import { mixins } from "vue-class-component";
-import AutocompleteMixin from "@/mixins/autocompleteMixin";
 import { namespace } from "vuex-class";
+import AutocompleteMixin from "@/mixins/autocompleteMixin";
 
-const weatherModule = namespace("weatherModule");
+const WeatherModule = namespace("weatherModule");
 
 @Component({
   name: "autocompleteInput",
 })
-export default class autocompleteInput extends mixins(AutocompleteMixin) {
-  @weatherModule.Action("fetchCurrentWeatherByCity")
+export default class AutocompleteInput extends mixins(AutocompleteMixin) {
+  @WeatherModule.Action("fetchCurrentWeatherByCity")
   private fetchCurrentWeatherByCity!: (value: string) => void;
 
-  @weatherModule.Action("fetchWeatherByCity")
+  @WeatherModule.Action("fetchWeatherByCity")
   private fetchWeatherByCity!: (value: string) => void;
 
   selectCity(city: string): void {
     this.fetchCurrentWeatherByCity(city);
     this.fetchWeatherByCity(city);
-    this.searchTerm = "";
+    this.reset();
+  }
+
+  reset(): void {
+    this.searchTermValue = "";
   }
 }
 </script>

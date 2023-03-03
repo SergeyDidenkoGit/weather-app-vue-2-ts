@@ -1,11 +1,23 @@
 import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
-import IAutocomplete from "@/interfaces/mixins/IAutocompleteInput";
+import { IAutocomplete } from "@/interfaces/mixins/IAutocompleteInput";
 
 @Component
 export default class autocompleteMixin extends Vue {
-  protected listCities: string[] = [];
-  public searchTerm = "";
+  private listCities: string[] = [];
+  protected searchTerm = "";
+
+  public get searchTermValue(): string {
+    return this.searchTerm;
+  }
+
+  public set searchTermValue(value: string) {
+    this.searchTerm = value;
+  }
+
+  public get searchCitiesLength(): boolean {
+    return this.searchCities.length > 0;
+  }
 
   public get searchCities(): [] | string[] {
     if (this.searchTerm === "") {

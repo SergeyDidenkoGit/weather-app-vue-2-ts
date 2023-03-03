@@ -1,21 +1,16 @@
 <template>
-  <button class="button">
+  <button class="custom-button">
     <slot></slot>
   </button>
 </template>
 
-<script>
-export default {
-  name: "custom-button",
-};
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+
+@Component({
+  name: "CustomButton",
+})
+export default class CustomButton extends Vue {}
 </script>
 
-<style scoped>
-.button {
-  padding: 12px 25px;
-  background: #0e3c62;
-  color: #ffffff;
-  border: none;
-  cursor: pointer;
-}
-</style>
+<style scoped></style>

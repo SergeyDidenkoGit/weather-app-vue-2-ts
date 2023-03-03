@@ -1,21 +1,18 @@
 <template>
   <section class="navbar">
     <div class="navbar__wrapper">
-      <figure
-        class="navbar__logo-wrapper"
-        @click="$router.push('/weather-app/')"
-      >
+      <figure class="navbar__logo-wrapper" @click="changePage('/weather-app/')">
         <img class="navbar__logo" src="@/assets/imgs/logo.png" alt="Logo" />
       </figure>
       <div class="navbar__buttons">
         <custom-button
           class="navbar__button-main"
-          @click.native="$router.push('/weather-app/')"
+          @click.native="changePage('/weather-app/')"
           >Main</custom-button
         >
         <custom-button
           class="navbar__button-favorites"
-          @click.native="$router.push('/weather-app/favorites')"
+          @click.native="changePage('/weather-app/favorites')"
           >Favorites</custom-button
         >
       </div>
@@ -23,11 +20,17 @@
   </section>
 </template>
 
-<script>
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: "navbar",
-};
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
+
+@Component({
+  name: "Navbar",
+})
+export default class Navbar extends Vue {
+  public changePage(page: string): void {
+    this.$router.push(page);
+  }
+}
 </script>
 
 <style scoped>

@@ -5,9 +5,5 @@ export interface IIpModuleState {
 }
 
 export interface IIpModuleResponse {
-  data:
-    | {
-        [key: string]: number | string | boolean;
-      }
-    | undefined;
+  data: Record<string, unknown>;
 }

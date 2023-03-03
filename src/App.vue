@@ -7,30 +7,18 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component } from "vue-property-decorator";
 import Navbar from "@/components/Navbar.vue";
 
-export default {
+@Component({
   components: {
     Navbar,
   },
-};
+})
+export default class autocompleteInput extends Vue {}
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-body {
-  background: #eeeeee;
-}
-
-#app {
-  max-width: 100%;
-  height: 100vh;
-}
+@import "@/assets/styles/imports.css";
 </style>

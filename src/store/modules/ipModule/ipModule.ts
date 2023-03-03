@@ -4,7 +4,8 @@ import {
   IIpModuleState,
   IIpModuleResponse,
 } from "@/interfaces/store/ipModule/IIpModule";
-import axios from "axios";
+import { requestIP } from "@/services/http/ip-http.service";
+import { AxiosResponse } from "axios";
 
 const state: IIpModuleState = {
   ipData: {},
@@ -20,9 +21,7 @@ const mutations: MutationTree<IIpModuleState> = {
 const actions: ActionTree<IIpModuleState, IRootState> = {
   fetchIP: async ({ commit }) => {
     try {
-      const response: IIpModuleResponse = await axios.get(
-        "https://ipapi.co/json/"
-      );
+      const response: AxiosResponse<IIpModuleResponse> = await requestIP();
       commit("setIP", response.data);
     } catch (e) {
       console.log(e);

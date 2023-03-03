@@ -45,7 +45,7 @@ import { Vue, Component } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import AutocompleteInput from "@/components/AutocompleteInput.vue";
 
-const ipModule = namespace("ipModule");
+const IpModule = namespace("ipModule");
 
 @Component({
   name: "Main",
@@ -54,7 +54,7 @@ const ipModule = namespace("ipModule");
   },
 })
 export default class Main extends Vue {
-  @ipModule.Action("fetchIP")
+  @IpModule.Action("fetchIP")
   private fetchIP!: () => void;
 
   private created(): void {

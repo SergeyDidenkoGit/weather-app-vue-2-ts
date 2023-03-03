@@ -1,26 +1,29 @@
 <template>
-  <div class="dialog" v-if="show" @click.stop="hideDialog">
+  <div class="dialog" v-if="showValue" @click.stop="hideDialog">
     <div @click.stop class="dialog__content">
       <slot></slot>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "custom-dialog",
-  props: {
-    show: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  methods: {
-    hideDialog() {
-      this.$emit("show", false);
-    },
-  },
-};
+<script lang="ts">
+import { Vue, Component, Prop } from "vue-property-decorator";
+
+@Component({
+  name: "CustomDialog",
+})
+export default class CustomDialog extends Vue {
+  @Prop()
+  private show!: boolean;
+
+  public get showValue(): boolean {
+    return this.show;
+  }
+
+  public hideDialog(): void {
+    this.$emit("show", false);
+  }
+}
 </script>
 
 <style scoped>
